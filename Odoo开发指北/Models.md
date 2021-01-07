@@ -55,7 +55,7 @@ Odoo模型是通过继承创建的
 
 ### 方法
 
-*调用和重写根据源码和本人建议，标记调用的方法也可重写*
+*调用和重写根据源码和本人建议，标记调用的方法也可重写，标记重写的方法同理，按需使用*
 
 #### view_init(self, fields_list)
 
@@ -112,19 +112,89 @@ eg：https://www.odoogo.com/post/87/
 - order：查询记录排序方式
 - count：为True时返回匹配记录条数
 
+#### name_get(self)
 
+重写：定义了该模型的记录在被关联，搜索时显示的名字，默认按照`_rec_name`指定的字段的值。
 
+返回`[(id, text_repr), ...]`
 
+#### name_create(self, name)
 
+调用：提供一个`name`创建一条记录并返回`(id, name)`。内部调用了`create`，作用大概是初始化一条记录，感觉没啥用，直接create就行了。
 
+#### name_search(self, name='', args=None, operator='ilike', limit=100)
 
+重写：定义了记录在被关联，被搜索时的查找逻辑。调用`_name_search`返回结果。
 
+- name：被搜索的关键字
+- args：domain
+- operator：用于匹配`name`的domain搜索符
+- limit：返回的最大记录条数
 
+#### _name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
 
+重写：name_search的私有方法，筛选结果后调用`name_get`返回`[(id, _rec_name), ...]`。允许在调用`name_get`时传递用户id已解决一些权限问题。
 
+#### read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True)
 
+重写：按照给定的`groupby`字段在列表视图中分组
 
+- domain：search视图中定义的domain
+- fields：tree视图中的字段
+- groupby：search视图中设置的groupby
+- offset：跳过的记录条数
+- limit：返回最大记录条数
+- orderby：排序，用于覆盖组的默认排序规则
+- lazy：
+  - True：将结果按照第一个groupby分组，剩余groupby放入`__context`中。即分组下面可有分组
+  - False：所有groupby在一次调用中完成。每个组展开一次即可全部展开
 
+返回一个`[{},...]`，每个组一个字典，每个字典包括：
+
+- 由groupby参数中的字段的值
+- 本组符合条件的数量
+- __domain：指定搜索条件的元组列表，其中包括search视图中指定的和按本次分组生成的
+- __context：参数字典，包括下一级分组的字段，eg：`{'group_by': ['字段A']}`
+
+#### read(self, fields=None, load='_classic_read')
+
+RPC调用：读取记录的请求字段。返回一个字典列表，每条记录一个字典
+
+- fields：[字段A, 字段B]
+
+#### workflow相关
+
+- create_workflow：为给定的记录创建工作流实例
+- delete_workflow：删除绑定到给定记录的工作流实例
+- step_workflow：修改给定记录的工作流实例
+- signal_workflow(self, signal)：给定记录发送工作流信号，并返回映射id到工作流结果的字典
+- redirect_workflow(self, old_new_ids)：将绑定给旧记录的工作流实例重新绑定给新记录，`old_new_ids = [(old, new), ...]`
+
+#### unlink(self)
+
+重写：删除当前记录
+
+#### write(self, vals)
+
+重写：使用提供的值更新当前的所有记录
+
+- vals：`{field: vals}`，键必须是字段名，值必须是符合键类型的值
+
+其中many2one必须是 关联模型设置的数据库标示符，例如id
+
+由于历史和兼容性原因，`date`和`datetime`字段使用字符串进行读和修改
+
+`one2many`和`many2many`使用特殊的格式来操作关联记录集。格式是按顺序执行的三元组的列表。
+
+| 三元组          | 描述                                                         | 条件                     |
+| --------------- | ------------------------------------------------------------ | ------------------------ |
+| (0, _, values)  | 根据values的字典创建一条新记录                               |                          |
+| (1, id, values) | 根据values的字典更新指定id的记录                             | 不能用于create           |
+| (2, id, _)      | 删除指定id记录的关联并在数据库中删除这条数据                 | 不能用于create           |
+| (3, id, _)      | 删除指定id记录的关联并但不删除这条数据                       | 不能用于one2many和create |
+| (4, id, _)      | 建立与指定id的记录的关联                                     | 不能用于one2many         |
+| (5, _, _)       | 移除所有关联的记录，等于在每个记录上使用命令3                | 不能用于one2many和create |
+| (6, _, ids)     | 使用ids列表中的记录替换原来的记录，相当于执行5之后为每个id执行4 | 不能用于one2many         |
 
 
 
