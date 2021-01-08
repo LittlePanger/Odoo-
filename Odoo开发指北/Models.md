@@ -25,31 +25,34 @@ Odoo模型是通过继承创建的
 
 模型属性：模型类可以使用一些属性来控制它们的一些行为
 
-| 属性名           | 默认值      | 描述                                                         |
-| ---------------- | ----------- | ------------------------------------------------------------ |
-| _auto            | False       | 是否自动创建数据                                             |
-| _register        | False       | 是否ORM中可见                                                |
-| _abstract        | True        | 模型是否为抽象                                               |
-| _transient       | False       | 模型是否为瞬态                                               |
-| _name            | None        | 模型名                                                       |
-| _description     | None        | 模型描述                                                     |
-| _custom          | False       | 自定义模型时为True                                           |
-| _inherit         | None        | 继承的模型，str or [str]                                     |
-| _inherits        | {}          | 委托继承，{'parent_model': 'm2o_field'}                      |
-| _constraints     | []          | Python 约束 (old API)                                        |
-| _table           | None        | 数据库表名                                                   |
-| _sequence        | None        | SQL sequence to use for ID field                             |
-| _sql_constraints | []          | SQL约束，[(name, sql_def, message)]                          |
-| _rec_name        | None        | 数据显示名称，默认为name字段                                 |
-| _order           | 'id'        | 搜索结果的默认顺序, 默认为id字段                             |
-| _parent_name     | 'parent_id' | 层次数据结构相关，the many2one field used as parent field    |
-| _parent_store    | False       | 层次数据结构相关，set to True to compute MPTT (parent_left, parent_right) |
-| _parent_order    | False       | 层次数据结构相关，order to use for siblings in MPTT          |
-| _date_name       | 'date'      | 用于默认日历视图的字段                                       |
-| _fold_name       | 'fold'      | 用于判断kanban视图的折叠组                                   |
-| _needaction      | False       | whether the model supports "need actions" (see mail)         |
-| _translate       | True        | 是否允许此模型的翻译导出                                     |
-| _depends         | {}          | dependencies of models backed up by sql views ，{model_name: field_names, ...} |
+| 属性名           | 默认值           | 描述                                                         |
+| ---------------- | ---------------- | ------------------------------------------------------------ |
+| _auto            | False            | 是否自动创建数据                                             |
+| _re.g.ister      | False            | 是否ORM中可见                                                |
+| _abstract        | True             | 模型是否为抽象                                               |
+| _transient       | False            | 模型是否为瞬态                                               |
+| _name            | None             | 模型名                                                       |
+| _description     | None             | 模型描述                                                     |
+| _custom          | False            | 自定义模型时为True                                           |
+| _inherit         | None             | 继承的模型，str or [str]                                     |
+| _inherits        | {}               | 委托继承，{'parent_model': 'm2o_field'}                      |
+| _constraints     | []               | Python 约束 (old API)                                        |
+| _table           | None             | 数据库表名                                                   |
+| _sequence        | None             | SQL sequence to use for ID field                             |
+| _sql_constraints | []               | SQL约束，[(name, sql_def, message)]                          |
+| _rec_name        | None             | 数据显示名称，默认为name字段                                 |
+| _order           | 'id'             | 搜索结果的默认顺序, 默认为id字段                             |
+| _parent_name     | 'parent_id'      | 层次数据结构相关，the many2one field used as parent field    |
+| _parent_store    | False            | 层次数据结构相关，set to True to compute MPTT (parent_left, parent_right) |
+| _parent_order    | False            | 层次数据结构相关，order to use for siblings in MPTT          |
+| _date_name       | 'date'           | 用于默认日历视图的字段                                       |
+| _fold_name       | 'fold'           | 用于判断kanban视图的折叠组                                   |
+| _needaction      | False            | whether the model supports "need actions" (see mail)         |
+| _translate       | True             | 是否允许此模型的翻译导出                                     |
+| _depends         | {}               | dependencies of models backed up by sql views ，{model_name: field_names, ...} |
+| _cr              | self.env.cr      | 当前环境的数据库游标                                         |
+| _uid             | self.env.uid     | 当前环境的用户id                                             |
+| _context         | self.env.context | 当前环境的上下文字典                                         |
 
 
 
@@ -75,7 +78,7 @@ Odoo模型是通过继承创建的
 
 ```python
 # groups已','分开，'!'表示不具有此组
-# eg：拥有base.group_user但无base.group_system的返回True
+# e.g.：拥有base.group_user但无base.group_system的返回True
 self.user_has_groups(groups='base.group_user,!base.group_system')
 ```
 
@@ -89,7 +92,7 @@ self.user_has_groups(groups='base.group_user,!base.group_system')
 
 odoo的视图以xml存放在`ir.ui.view`表中，属于静态格式，设计之后就固定了。通过修改该方法可以在视图加载时动态修改视图的结构
 
-eg：https://www.odoogo.com/post/87/
+e.g.https://www.odoogo.com/post/87/
 
 #### get_formview_action(self)
 
@@ -154,7 +157,7 @@ eg：https://www.odoogo.com/post/87/
 - 由groupby参数中的字段的值
 - 本组符合条件的数量
 - __domain：指定搜索条件的元组列表，其中包括search视图中指定的和按本次分组生成的
-- __context：参数字典，包括下一级分组的字段，eg：`{'group_by': ['字段A']}`
+- __context：参数字典，包括下一级分组的字段，e.g.：`{'group_by': ['字段A']}`
 
 #### read(self, fields=None, load='_classic_read')
 
@@ -178,7 +181,7 @@ RPC调用：读取记录的请求字段。返回一个字典列表，每条记�
 
 重写：使用提供的值更新当前的所有记录
 
-- vals：`{field: vals}`，键必须是字段名，值必须是符合键类型的值
+- vals：`{'field_name': field_value, ...}`，键必须是字段名，值必须是符合键类型的值
 
 其中many2one必须是 关联模型设置的数据库标示符，例如id
 
@@ -196,7 +199,203 @@ RPC调用：读取记录的请求字段。返回一个字典列表，每条记�
 | (5, _, _)       | 移除所有关联的记录，等于在每个记录上使用命令3                | 不能用于one2many和create |
 | (6, _, ids)     | 使用ids列表中的记录替换原来的记录，相当于执行5之后为每个id执行4 | 不能用于one2many         |
 
+#### create(self, vals)
 
+重写：使用提供的值创建一条新记录并返回
+
+- vals：`{'field_name': field_value, ...}`，键必须是字段名，值必须是符合键类型的值
+
+#### copy(self, default=None)
+
+调用：复制一条新记录并返回，如果提供了default则覆盖记录的原始值
+
+- default：`{'field_name': overridden_value, ...}`，键必须是字段名，值必须是符合键类型的值
+
+#### exists(self)
+
+调用：返回一个仅存在于数据库中记录的新的记录集。可以用来检查是否该记录依旧存在
+
+#### search_read(self, domain=None, fields=None, offset=0, limit=None, order=None)
+
+重写：执行`search()`后执行`read()`。通过重写可以限制用户在tree或kanban视图查看的记录。通过这种方法限制的记录虽然无法在视图中点击查看，但是可以通过修改url的方式查看记录。
+
+- domain：domain，详见search()
+- fields：字段的列表，详见read()
+- offset：跳过的记录条数，详见search()
+- limit：返回最大记录条数，详见search()
+- order：排序，详见search()
+- return：返回包含要求字段的字典列表，[{}, ...]
+
+#### toggle_active(self)
+
+调用：翻转记录中active的值。每条记录默认具有一个active字段(bool类型)，若该字段为False，则在视图不可见，必须通过search搜索
+
+#### _re.g.ister_hook(self)
+
+建立注册表后执行的操作
+
+#### _patch_method(cls, name, method)
+
+调用：猴子补丁适用于所有模型的所有实例。在给定的类中，使用`method`的方法替代了`name`的方法。通过`method.origin`访问原始方法，并可使用`_revert_method(method)`恢复
+
+- name：被打补丁的方法名，字符串
+- method：补丁的方法
+
+e.g.   官方提供的例子，未验证，翻译仅参考
+
+```python
+@api.multi
+def do_write(self, values):
+    # 处理一些操作，并调用原始write方法
+    return do_write.origin(self, values)
+
+# 该模型write方法的补丁
+model._patch_method('write', do_write)
+
+# 这里将会调用do_write
+records = model.search([...])
+records.write(...)
+
+# 恢复原始方法
+model._revert_method('write')
+```
+
+个人理解：通过这种方式可以减少write函数中的代码量，否则还要在write中增加判断，何时执行do_write的一些操作。虽然官方代码中很少用，但是个人觉得还是很好的一个方法。
+
+
+
+#### browse(self, arg=None, prefetch=None)
+
+调用：通过提供的`id`或`[ids]`返回当前环境的记录集
+
+#### ids(self)
+
+调用：返回此记录集中的实际记录id的列表
+
+#### ensure_one(self)
+
+调用：验证当前记录集是否为单个记录。否则引发异常。
+
+#### with_env(self, env)
+
+调用：使用提供的环境返回一个该记录集的新环境
+
+- env：class:`~odoo.api.Environment`
+
+> warning::
+>             The new environment will not benefit from the current
+>             environment's data cache, so later data access may incur extra
+>             delays while re-fetching from the database.
+>             The returned recordset has the same prefetch object as ``self``.
+
+#### sudo(self, user=SUPERUSER_ID)
+
+调用：使用提供的用户返回一个该记录集的新环境。一般用来提升权限，也用来切换用户进行一些操作。
+
+- user：用户id，默认使用SUPERUSER_ID，返回超级用户的环境，可以绕过访问控制和权限规则
+
+> ​    .. note::
+>
+> ​        Using ``sudo`` could cause data access to cross the
+> ​        boundaries of record rules, possibly mixing records that
+> ​        are meant to be isolated (e.g. records from different
+> ​        companies in multi-company environments).
+>
+> ​        It may lead to un-intuitive results in methods which select one
+> ​        record among many - for example getting the default company, or
+> ​        selecting a Bill of Materials.
+>
+> ​    .. note::
+>
+> ​        Because the record rules and access control will have to be
+> ​        re-evaluated, the new recordset will not benefit from the current
+> ​        environment's data cache, so later data access may incur extra
+> ​        delays while re-fetching from the database.
+> ​        The returned recordset has the same prefetch object as ``self``.
+
+#### with_context(self, *args, **kwargs)
+
+调用：使用提供的上下文返回一个该记录集的新环境。提供的上下文可以覆盖也可以扩展。
+
+e.g.
+
+```python
+# current context is {'key1': True}
+r2 = records.with_context({}, key2=True)
+# -> r2._context is {'key2': True}
+r2 = records.with_context(key2=True)
+# -> r2._context is {'key1': True, 'key2': True}
+```
+
+> .. note:
+>
+> ​        The returned recordset has the same prefetch object as ``self``.
+
+#### with_prefetch(self, prefetch=None)
+
+调用：使用提供的预取对象返回一个该记录集的新环境，若未提供，则返回新的预取对象。
+
+prefetch相关的不知道干嘛用
+
+#### mapped(self, func)
+
+调用：对所有记录应用func，并将结果作为列表或记录集返回（如果func返回记录集）。在后一种情况下，返回的记录集的顺序是任意的。
+
+- func：可以是函数名或匿名函数；也可以使用字段名的字符串来获取字段的值，支持链式
+
+e.g.
+
+```python
+# returns a list of summing two fields for each record in the set
+records.mapped(lambda r: r.field1 + r.field2)
+
+# returns a list of names
+records.mapped('name')
+
+# returns a recordset of partners
+record.mapped('partner_id')
+
+# returns the union of all partner banks, with duplicates removed
+record.mapped('partner_id.bank_ids')
+```
+
+#### filtered(self, func)
+
+调用：返回一个只包含满足提供判定函数的记录集。
+
+- func：可以是函数名或匿名函数；也可以是字段（Boolean类型）名的字符串，支持链式
+
+e.g.
+
+```python
+# only keep records whose company is the current user's
+records.filtered(lambda r: r.company_id == user.company_id)
+
+# only keep records whose partner is a company
+records.filtered("partner_id.is_company")
+```
+
+#### sorted(self, key=None, reverse=False)
+
+调用：返回一个通过关键字函数排序的记录集。
+
+- key：一个参数的功能，它为每个记录返回一个键，或者是一个字段名，如果未提供关键字，使用模块默认的排序
+- reverse：若为True，以相反的顺序返回结果
+
+e.g.
+
+```python
+# sort records by name
+records.sorted(key=lambda r: r.name)
+```
+
+#### update(self, values)
+
+调用：使用values更新记录。
+
+#### new(self, values={})
+
+调用：使用values创建当前环境的新记录并返回。记录不是在数据库中创建的，它仅存在于内存中。
 
 
 
