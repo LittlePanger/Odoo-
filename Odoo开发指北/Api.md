@@ -1,34 +1,28 @@
 # api
 
-```
-This module provides the elements for managing two different API styles,
-    namely the "traditional" and "record" styles.
+该模块提供了用于管理两种不同API样式的方法。
 
-    In the "traditional" style, parameters like the database cursor, user id,
-    context dictionary and record ids (usually denoted as ``cr``, ``uid``,
-    ``context``, ``ids``) are passed explicitly to all methods. In the "record"
-    style, those parameters are hidden into model instances, which gives it a
-    more object-oriented feel.
+在传统样式中，数据库游标，用户id，上下文字典和记录id（通常表示为`cr`,`uid`,`context`,`ids`）等参数是显示传递给所有方法。
 
-    For instance, the statements::
+在记录样式中，这些参数被隐藏在模型实例中，从而使其更具有面向对象的感觉。
 
-        model = self.pool.get(MODEL)
-        ids = model.search(cr, uid, DOMAIN, context=context)
-        for rec in model.browse(cr, uid, ids, context=context):
-            print rec.name
-        model.write(cr, uid, ids, VALUES, context=context)
+e.g.
 
-    may also be written as::
+```python
+# 传统样式
+model = self.pool.get(MODEL)
+ids = model.search(cr, uid, DOMAIN, context=context)
+for rec in model.browse(cr, uid, ids, context=context):
+	print rec.name
+model.write(cr, uid, ids, VALUES, context=context)
 
-        env = Environment(cr, uid, context) # cr, uid, context wrapped in env
-        model = env[MODEL]                  # retrieve an instance of MODEL
-        recs = model.search(DOMAIN)         # search returns a recordset
-        for rec in recs:                    # iterate over the records
-            print rec.name
-        recs.write(VALUES)                  # update all records in recs
-
-    Methods written in the "traditional" style are automatically decorated,
-    following some heuristics based on parameter names.
+# 记录样式
+env = Environment(cr, uid, context) # cr, uid, context被包裹在env中
+model = env[MODEL]                  # 使用env激活MODEL实例
+recs = model.search(DOMAIN)         # 搜索并返回记录集
+for rec in recs:                    # 遍历记录集
+	print rec.name
+recs.write(VALUES)                  # 更新记录集中所有记录
 ```
 
 
