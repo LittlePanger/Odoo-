@@ -46,6 +46,8 @@ Relax NG 是 REgular LAnguage for XML Next Generation的缩写，即”[可扩�
 
 ## 常见节点标签名及其属性
 
+https://www.odoo.com/documentation/10.0/reference/data.html
+
 ### odoo，openerp，data
 
 - noupdate
